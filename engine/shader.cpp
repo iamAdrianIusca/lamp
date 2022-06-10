@@ -60,3 +60,9 @@ void Shader::setInt(const std::string &name, int value) const
 void Shader::setFloat(const std::string &name, float value) const
 {
 }
+
+void Shader::setMat4(int index, float* data)
+{
+    glUniformMatrix4fv(index, 1, GL_FALSE, data);
+}
+
