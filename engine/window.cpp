@@ -10,11 +10,6 @@ Window::Window()
     m_data.isClosed = false;
 }
 
-Window::~Window()
-{
-    destroy();
-}
-
 void Window::create(const char *title, int width, int height)
 {
     m_data.title = title;

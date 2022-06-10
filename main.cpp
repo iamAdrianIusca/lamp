@@ -11,7 +11,7 @@
 int main()
 {
     // declare window size
-    const int width = 800;
+    const int width  = 800;
     const int height = 600;
 
     Window window;
@@ -78,8 +78,7 @@ int main()
         glm::mat4 scale     = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
         // calculate perspective matrix with glm
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
-
+        glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
         glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
 
         // close the window on escape key
@@ -95,7 +94,7 @@ int main()
         glm::mat4 transform = translate * rotate * scale;
 
         shader.setMat4(0, glm::value_ptr(transform));
-        shader.setMat4(1, glm::value_ptr(projection));
+        shader.setMat4(1, glm::value_ptr(proj));
         shader.setMat4(2, glm::value_ptr(view));
 
         glBindVertexArray(VAO);

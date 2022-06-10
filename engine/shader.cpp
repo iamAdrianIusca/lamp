@@ -4,9 +4,7 @@
 
 Shader::Shader(const char *vertexPath, const char *fragmentPath)
 {
-    // create vertex shader stage
     ShaderStage vertexShader(vertexPath, GL_VERTEX_SHADER);
-    // create fragment shader stage
     ShaderStage fragmentShader(fragmentPath, GL_FRAGMENT_SHADER);
 
     m_program = glCreateProgram();
@@ -27,10 +25,6 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath)
     // delete shader stages
     vertexShader.release();
     fragmentShader.release();
-}
-
-Shader::~Shader()
-{
 }
 
 void Shader::use() const

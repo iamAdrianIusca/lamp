@@ -9,7 +9,7 @@ class Window
 {
 public:
     Window();
-    ~Window();
+    ~Window() = default;
 
     void create(const char* title, int width, int height);
     void update();

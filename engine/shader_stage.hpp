@@ -4,7 +4,7 @@ class ShaderStage
 {
 public:
     ShaderStage(const char* data, int type);
-    ~ShaderStage();
+    ~ShaderStage() = default;
 
     void release();
 
