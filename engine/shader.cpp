@@ -1,43 +1,32 @@
 #include "shader.hpp"
+#include "shader_stage.hpp"
 #include <iostream>
 
 Shader::Shader(const char *vertexPath, const char *fragmentPath)
 {
-    // create a opengl shader
-    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexPath, nullptr);
-    glCompileShader(vertexShader);
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, nullptr, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-
-    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentPath, nullptr);
-    glCompileShader(fragmentShader);
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, nullptr, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
+    // create vertex shader stage
+    ShaderStage vertexShader(vertexPath, GL_VERTEX_SHADER);
+    // create fragment shader stage
+    ShaderStage fragmentShader(fragmentPath, GL_FRAGMENT_SHADER);
 
     m_program = glCreateProgram();
-    glAttachShader(m_program, vertexShader);
-    glAttachShader(m_program, fragmentShader);
+    glAttachShader(m_program, vertexShader.getId());
+    glAttachShader(m_program, fragmentShader.getId());
     glLinkProgram(m_program);
+
+    int success;
+    char infoLog[512];
+
     glGetProgramiv(m_program, GL_LINK_STATUS, &success);
     if (!success)
     {
         glGetProgramInfoLog(m_program, 512, nullptr, infoLog);
         std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
     }
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+
+    // delete shader stages
+    vertexShader.release();
+    fragmentShader.release();
 }
 
 Shader::~Shader()
