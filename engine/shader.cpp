@@ -22,7 +22,6 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath)
         std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
     }
 
-    // delete shader stages
     vertexShader.release();
     fragmentShader.release();
 }

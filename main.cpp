@@ -1,12 +1,22 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <vector>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include <iostream>
+
 #include "window.hpp"
 #include "shader.hpp"
+
+std::vector<float> processNode(aiNode *pNode, const aiScene *pScene);
+std::vector<float> processMesh(aiMesh *pMesh, const aiScene *pScene);
 
 int main()
 {
@@ -17,7 +27,6 @@ int main()
     Window window;
     window.create("Game Engine", width, height);
 
-    // create vertex shader source code
     const char* vertexShaderSource = "#version 430 core\n"
                                      "layout (location = 0) in vec3 position;\n"
                                      "layout (location = 0) uniform mat4 model;\n"
@@ -28,7 +37,6 @@ int main()
                                      "    gl_Position = projection * view * model * vec4(position, 1.0);\n"
                                      "}\0";
 
-    // create fragment shader source code
     const char* fragmentShaderSource = "#version 330 core\n"
                                        "out vec4 color;\n"
                                        "void main()\n"
@@ -43,17 +51,23 @@ int main()
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
-    // create vertex buffer object data
-    float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f
-    };
+    // load model with assimp
+    Assimp::Importer importer;
+    const aiScene* scene = importer.ReadFile("cube.obj", aiProcess_Triangulate | aiProcess_FlipUVs);
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+    {
+        std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
+        return -1;
+    }
+    std::cout << "Loaded model: " << scene->mRootNode->mName.C_Str() << std::endl;
+
+    // process node
+    std::vector<float> vertices = processNode(scene->mRootNode, scene);
 
     unsigned int VBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
 
     // set vertex attributes
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -73,13 +87,13 @@ int main()
         lastFrame = currentFrame;
 
         // rotate glm matrix with delta time
-        glm::mat4 rotate    = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        glm::mat4 rotate    = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(1.0f, 1.0f, 1.0f));
         glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-        glm::mat4 scale     = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+        glm::mat4 scale     = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.5f, 0.5f));
 
         // calculate perspective matrix with glm
         glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
-        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
+        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
 
         // close the window on escape key
         if (window.isKeyPressed(GLFW_KEY_ESCAPE))
@@ -91,6 +105,7 @@ int main()
 
         shader.use();
 
+        //glm::mat4 transform = scale * rotate * translate;
         glm::mat4 transform = translate * rotate * scale;
 
         shader.setMat4(0, glm::value_ptr(transform));
@@ -99,8 +114,8 @@ int main()
 
         glBindVertexArray(VAO);
 
-        // draw triangles
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        // draw triangle
+        glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 
         window.update();
     }
@@ -108,4 +123,38 @@ int main()
     window.destroy();
 
     return 0;
+}
+
+std::vector<float> processNode(aiNode *pNode, const aiScene *pScene)
+{
+    // process all meshes in node
+    for (unsigned int i = 0; i < pNode->mNumMeshes; i++)
+    {
+        aiMesh* mesh = pScene->mMeshes[pNode->mMeshes[i]];
+        return processMesh(mesh, pScene);
+    }
+
+    // process all children nodes
+    for (unsigned int i = 0; i < pNode->mNumChildren; i++)
+    {
+        return processNode(pNode->mChildren[i], pScene);
+    }
+
+    return std::vector<float>();
+}
+
+std::vector<float> processMesh(aiMesh *pMesh, const aiScene *pScene)
+{
+    // process vertices
+    std::vector<float> vertices;
+    for (unsigned int i = 0; i < pMesh->mNumVertices; i++)
+    {
+        aiVector3D pos = pMesh->mVertices[i];
+
+        vertices.push_back(pos.x);
+        vertices.push_back(pos.y);
+        vertices.push_back(pos.z);
+    }
+
+    return vertices;
 }

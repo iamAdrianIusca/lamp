@@ -65,12 +65,12 @@ void Window::destroy()
     glfwTerminate();
 }
 
-bool Window::isClosed()
+bool Window::isClosed() const
 {
     return m_data.isClosed || glfwWindowShouldClose(m_data.window);
 }
 
-bool Window::isKeyPressed(unsigned int keycode)
+bool Window::isKeyPressed(unsigned int keycode) const
 {
     return glfwGetKey(m_data.window, keycode) == GLFW_PRESS;
 }

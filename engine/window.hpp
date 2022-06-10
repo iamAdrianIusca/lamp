@@ -17,8 +17,8 @@ public:
     void destroy();
     void close();
 
-    bool isClosed();
-    bool isKeyPressed(unsigned int keycode);
+    bool isClosed() const;
+    bool isKeyPressed(unsigned int keycode) const;
 
     inline int getWidth() const { return m_data.width; }
     inline int getHeight() const { return m_data.height; }

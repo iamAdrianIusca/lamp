@@ -8,8 +8,10 @@ ShaderStage::ShaderStage(const char *data, int type)
     m_id = glCreateShader(type);
     glShaderSource(m_id, 1, &data, nullptr);
     glCompileShader(m_id);
+
     int success;
     char infoLog[512];
+
     glGetShaderiv(m_id, GL_COMPILE_STATUS, &success);
     if (!success)
     {
