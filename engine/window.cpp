@@ -4,9 +4,6 @@
 
 Window::Window()
 {
-    m_data.title = "GLFW Window";
-    m_data.width = 800;
-    m_data.height = 600;
     m_data.isClosed = false;
 }
 

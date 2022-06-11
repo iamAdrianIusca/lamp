@@ -20,8 +20,8 @@ public:
     bool isClosed() const;
     bool isKeyPressed(unsigned int keycode) const;
 
-    inline int getWidth() const { return m_data.width; }
-    inline int getHeight() const { return m_data.height; }
+    int getWidth() const  { return m_data.width;  }
+    int getHeight() const { return m_data.height; }
 
 private:
     struct WindowData

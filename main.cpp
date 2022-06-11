@@ -1,5 +1,4 @@
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 #include <vector>
 #include <iostream>
@@ -15,6 +14,8 @@
 #include "window.hpp"
 #include "shader.hpp"
 #include "buffer.hpp"
+#include "keys.hpp"
+#include "time.hpp"
 
 std::vector<float> processNode(aiNode *pNode, const aiScene *pScene);
 std::vector<float> processMesh(aiMesh *pMesh, const aiScene *pScene);
@@ -81,12 +82,12 @@ int main()
     while (!window.isClosed())
     {
         // calculate delta time
-        auto currentFrame = (float)glfwGetTime();
+        auto currentFrame = Time::getTotalTime();
         float deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
         // rotate glm matrix with delta time
-        glm::mat4 rotate    = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(1.0f, 1.0f, 1.0f));
+        glm::mat4 rotate    = glm::rotate(glm::mat4(1.0f), Time::getTotalTime(), glm::vec3(1.0f, 1.0f, 1.0f));
         glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         glm::mat4 scale     = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.5f, 0.5f));
 
@@ -95,7 +96,7 @@ int main()
         glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
 
         // close the window on escape key
-        if (window.isKeyPressed(GLFW_KEY_ESCAPE))
+        if (window.isKeyPressed(ESC_KEY))
         {
             window.close();
         }
@@ -148,7 +149,7 @@ std::vector<float> processMesh(aiMesh *pMesh, const aiScene *pScene)
     std::vector<float> vertices;
     for (unsigned int i = 0; i < pMesh->mNumVertices; i++)
     {
-        aiVector3D pos = pMesh->mVertices[i];
+        const aiVector3D& pos = pMesh->mVertices[i];
 
         vertices.push_back(pos.x);
         vertices.push_back(pos.y);
