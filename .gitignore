@@ -1,2 +1,5 @@
 .idea
 cmake-build-debug-visual-studio
+
+*.exe
+*.pdb

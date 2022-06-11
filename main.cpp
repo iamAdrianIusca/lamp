@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 
 #include <vector>
+#include <iostream>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -10,10 +11,10 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include <iostream>
 
 #include "window.hpp"
 #include "shader.hpp"
+#include "buffer.hpp"
 
 std::vector<float> processNode(aiNode *pNode, const aiScene *pScene);
 std::vector<float> processMesh(aiMesh *pMesh, const aiScene *pScene);
@@ -64,10 +65,8 @@ int main()
     // process node
     std::vector<float> vertices = processNode(scene->mRootNode, scene);
 
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
+    // create vbo buffer for vertices
+    Buffer vboBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices.size() * sizeof(float), vertices.data());
 
     // set vertex attributes
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -140,7 +139,7 @@ std::vector<float> processNode(aiNode *pNode, const aiScene *pScene)
         return processNode(pNode->mChildren[i], pScene);
     }
 
-    return std::vector<float>();
+    return { };
 }
 
 std::vector<float> processMesh(aiMesh *pMesh, const aiScene *pScene)

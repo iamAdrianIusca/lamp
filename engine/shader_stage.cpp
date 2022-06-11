@@ -20,7 +20,7 @@ ShaderStage::ShaderStage(const char *data, int type)
     }
 }
 
-void ShaderStage::release()
+void ShaderStage::release() const
 {
     glDeleteShader(m_id);
 }

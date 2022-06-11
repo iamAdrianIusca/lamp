@@ -6,7 +6,7 @@ public:
     ShaderStage(const char* data, int type);
     ~ShaderStage() = default;
 
-    void release();
+    void release() const;
 
     unsigned int getId() const;
 
