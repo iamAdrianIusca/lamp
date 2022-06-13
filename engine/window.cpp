@@ -9,8 +9,8 @@ Window::Window()
 
 void Window::create(const char *title, int width, int height)
 {
-    m_data.title = title;
-    m_data.width = width;
+    m_data.title  = title;
+    m_data.width  = width;
     m_data.height = height;
 
     if (!glfwInit())

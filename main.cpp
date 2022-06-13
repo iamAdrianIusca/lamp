@@ -16,6 +16,7 @@
 #include "buffer.hpp"
 #include "keys.hpp"
 #include "time.hpp"
+#include "file.hpp"
 
 std::vector<float> processNode(aiNode *pNode, const aiScene *pScene);
 std::vector<float> processMesh(aiMesh *pMesh, const aiScene *pScene);
@@ -29,31 +30,14 @@ int main()
     Window window;
     window.create("Game Engine", width, height);
 
-    const char* vertexShaderSource = "#version 430 core\n"
-                                     "layout (location = 0) in vec3 position;\n"
-                                     "layout (location = 0) uniform mat4 model;\n"
-                                     "layout (location = 1) uniform mat4 projection;\n"
-                                     "layout (location = 2) uniform mat4 view;\n"
-                                     "void main()\n"
-                                     "{\n"
-                                     "    gl_Position = projection * view * model * vec4(position, 1.0);\n"
-                                     "}\0";
-
-    const char* fragmentShaderSource = "#version 330 core\n"
-                                       "out vec4 color;\n"
-                                       "void main()\n"
-                                       "{\n"
-                                       "   color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-                                       "}\n\0";
-
-    Shader shader(vertexShaderSource, fragmentShaderSource);
+    Shader shader(File::read_file("simple_vert.glsl").c_str(),
+                  File::read_file("simple_frag.glsl").c_str());
 
     // create a vertex array object
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
-    // load model with assimp
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile("cube.obj", aiProcess_Triangulate | aiProcess_FlipUVs);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
