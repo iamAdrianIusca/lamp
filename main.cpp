@@ -34,18 +34,19 @@ int main()
         std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
         return -1;
     }
-    std::cout << "Loaded model: " << scene->mRootNode->mName.C_Str() << std::endl;
 
-    std::vector<float> vertices = Importer::process_node(scene->mRootNode, scene);
+    std::vector<model> models = Importer::process_node(scene->mRootNode, scene);
+
+    model cube_model = models[0];
 
     VertexArray vao;
     vao.bind();
 
     // create vbo buffer for vertices
-    Buffer vboBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices.size() * sizeof(float), vertices.data());
+    Buffer vboBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, cube_model.vertices.size() * sizeof(vertex), cube_model.vertices.data());
 
     // set vertex attributes
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)0);
     glEnableVertexAttribArray(0);
 
     // initialize delta time
@@ -89,8 +90,7 @@ int main()
 
         vao.bind();
 
-        // draw triangle
-        glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+        glDrawArrays(GL_TRIANGLES, 0, cube_model.vertices.size());
 
         window.update();
     }
@@ -99,5 +99,3 @@ int main()
 
     return 0;
 }
-
-
