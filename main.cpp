@@ -12,6 +12,7 @@
 #include <assimp/postprocess.h>
 
 #include "window.hpp"
+#include "vertex_array.hpp"
 #include "shader.hpp"
 #include "buffer.hpp"
 #include "keys.hpp"
@@ -33,11 +34,6 @@ int main()
     Shader shader(File::read_file("simple_vert.glsl").c_str(),
                   File::read_file("simple_frag.glsl").c_str());
 
-    // create a vertex array object
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile("cube.obj", aiProcess_Triangulate | aiProcess_FlipUVs);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -49,6 +45,9 @@ int main()
 
     // process node
     std::vector<float> vertices = processNode(scene->mRootNode, scene);
+
+    VertexArray vao;
+    vao.bind();
 
     // create vbo buffer for vertices
     Buffer vboBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices.size() * sizeof(float), vertices.data());
@@ -96,7 +95,7 @@ int main()
         shader.setMat4(1, glm::value_ptr(proj));
         shader.setMat4(2, glm::value_ptr(view));
 
-        glBindVertexArray(VAO);
+        vao.bind();
 
         // draw triangle
         glDrawArrays(GL_TRIANGLES, 0, vertices.size());
