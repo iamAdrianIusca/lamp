@@ -24,7 +24,6 @@ std::vector<float> processMesh(aiMesh *pMesh, const aiScene *pScene);
 
 int main()
 {
-    // declare window size
     const int width  = 800;
     const int height = 600;
 

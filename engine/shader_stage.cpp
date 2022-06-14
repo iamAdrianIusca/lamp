@@ -5,27 +5,22 @@
 
 ShaderStage::ShaderStage(const char *data, int type)
 {
-    m_id = glCreateShader(type);
-    glShaderSource(m_id, 1, &data, nullptr);
-    glCompileShader(m_id);
+    _handle = glCreateShader(type);
+    glShaderSource(_handle, 1, &data, nullptr);
+    glCompileShader(_handle);
 
     int success;
     char infoLog[512];
 
-    glGetShaderiv(m_id, GL_COMPILE_STATUS, &success);
+    glGetShaderiv(_handle, GL_COMPILE_STATUS, &success);
     if (!success)
     {
-        glGetShaderInfoLog(m_id, 512, nullptr, infoLog);
+        glGetShaderInfoLog(_handle, 512, nullptr, infoLog);
         std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
 }
 
 void ShaderStage::release() const
 {
-    glDeleteShader(m_id);
-}
-
-unsigned int ShaderStage::getId() const
-{
-    return m_id;
+    glDeleteShader(_handle);
 }

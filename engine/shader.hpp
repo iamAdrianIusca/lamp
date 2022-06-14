@@ -1,9 +1,10 @@
 #pragma once
 
-#include <glad/glad.h>
+#include "object.hpp"
+
 #include <string>
 
-class Shader
+class Shader final : public Object
 {
 public:
     Shader(const char* vertexPath, const char* fragmentPath);
@@ -16,7 +17,4 @@ public:
     void setFloat(const std::string& name, float value) const;
 
     void setMat4(int index, float* data);
-
-private:
-    unsigned int m_program;
 };

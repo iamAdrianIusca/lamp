@@ -4,10 +4,10 @@
 
 VertexArray::VertexArray()
 {
-    glGenVertexArrays(1, &m_vao);
+    glGenVertexArrays(1, &_handle);
 }
 
 void VertexArray::bind() const
 {
-    glBindVertexArray(m_vao);
+    glBindVertexArray(_handle);
 }

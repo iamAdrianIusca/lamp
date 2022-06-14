@@ -1,6 +1,8 @@
 #pragma once
 
-class Buffer
+#include "object.hpp"
+
+class Buffer final : public Object
 {
 public:
 	Buffer(unsigned int type, unsigned int usage, unsigned int size, void* data);
@@ -9,6 +11,5 @@ public:
 	void bind() const;
 
 private:
-    unsigned int m_id;
     unsigned int m_type;
 };

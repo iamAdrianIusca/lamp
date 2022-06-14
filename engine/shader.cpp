@@ -1,5 +1,7 @@
 #include "shader.hpp"
 #include "shader_stage.hpp"
+
+#include <glad/glad.h>
 #include <iostream>
 
 Shader::Shader(const char *vertexPath, const char *fragmentPath)
@@ -7,18 +9,18 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath)
     ShaderStage vertexShader(vertexPath, GL_VERTEX_SHADER);
     ShaderStage fragmentShader(fragmentPath, GL_FRAGMENT_SHADER);
 
-    m_program = glCreateProgram();
-    glAttachShader(m_program, vertexShader.getId());
-    glAttachShader(m_program, fragmentShader.getId());
-    glLinkProgram(m_program);
+    _handle = glCreateProgram();
+    glAttachShader(_handle, vertexShader.get_id());
+    glAttachShader(_handle, fragmentShader.get_id());
+    glLinkProgram(_handle);
 
     int success;
     char infoLog[512];
 
-    glGetProgramiv(m_program, GL_LINK_STATUS, &success);
+    glGetProgramiv(_handle, GL_LINK_STATUS, &success);
     if (!success)
     {
-        glGetProgramInfoLog(m_program, 512, nullptr, infoLog);
+        glGetProgramInfoLog(_handle, 512, nullptr, infoLog);
         std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
     }
 
@@ -28,7 +30,7 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath)
 
 void Shader::use() const
 {
-    glUseProgram(m_program);
+    glUseProgram(_handle);
 }
 
 void Shader::setBool(const std::string &name, bool value) const

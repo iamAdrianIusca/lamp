@@ -1,13 +1,12 @@
 #pragma once
 
-class VertexArray
+#include "object.hpp"
+
+class VertexArray final : public Object
 {
 public:
     VertexArray();
     ~VertexArray() = default;
 
     void bind() const;
-
-private:
-    unsigned int m_vao;
 };
