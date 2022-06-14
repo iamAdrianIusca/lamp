@@ -9,7 +9,7 @@ find_package(Vulkan)
 
 add_executable(${PROJECT_NAME})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Vulkan::Vulkan glfw glad glm assimp engine)
+target_link_libraries(${PROJECT_NAME} PRIVATE Vulkan::Vulkan glm engine)
 
 target_sources(${PROJECT_NAME} PRIVATE main.cpp)
 

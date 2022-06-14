@@ -7,10 +7,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
 #include "window.hpp"
 #include "vertex_array.hpp"
 #include "shader.hpp"
@@ -18,9 +14,7 @@
 #include "keys.hpp"
 #include "time.hpp"
 #include "file.hpp"
-
-std::vector<float> processNode(aiNode *pNode, const aiScene *pScene);
-std::vector<float> processMesh(aiMesh *pMesh, const aiScene *pScene);
+#include "importer.hpp"
 
 int main()
 {
@@ -42,8 +36,7 @@ int main()
     }
     std::cout << "Loaded model: " << scene->mRootNode->mName.C_Str() << std::endl;
 
-    // process node
-    std::vector<float> vertices = processNode(scene->mRootNode, scene);
+    std::vector<float> vertices = Importer::process_node(scene->mRootNode, scene);
 
     VertexArray vao;
     vao.bind();
@@ -65,7 +58,7 @@ int main()
     {
         // calculate delta time
         auto currentFrame = Time::getTotalTime();
-        float deltaTime = currentFrame - lastFrame;
+        float deltaTime   = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
         // rotate glm matrix with delta time
@@ -107,36 +100,4 @@ int main()
     return 0;
 }
 
-std::vector<float> processNode(aiNode *pNode, const aiScene *pScene)
-{
-    // process all meshes in node
-    for (unsigned int i = 0; i < pNode->mNumMeshes; i++)
-    {
-        aiMesh* mesh = pScene->mMeshes[pNode->mMeshes[i]];
-        return processMesh(mesh, pScene);
-    }
 
-    // process all children nodes
-    for (unsigned int i = 0; i < pNode->mNumChildren; i++)
-    {
-        return processNode(pNode->mChildren[i], pScene);
-    }
-
-    return { };
-}
-
-std::vector<float> processMesh(aiMesh *pMesh, const aiScene *pScene)
-{
-    // process vertices
-    std::vector<float> vertices;
-    for (unsigned int i = 0; i < pMesh->mNumVertices; i++)
-    {
-        const aiVector3D& pos = pMesh->mVertices[i];
-
-        vertices.push_back(pos.x);
-        vertices.push_back(pos.y);
-        vertices.push_back(pos.z);
-    }
-
-    return vertices;
-}
