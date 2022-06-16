@@ -18,8 +18,8 @@
 
 int main()
 {
-    const int width  = 800;
-    const int height = 600;
+    const int width  = 1024;
+    const int height = 768;
 
     Window window;
     window.create("Game Engine", width, height);
@@ -27,23 +27,40 @@ int main()
     Shader shader(File::read_file("simple_vert.glsl").c_str(),
                   File::read_file("simple_frag.glsl").c_str());
 
-    Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile("cube.obj", aiProcess_Triangulate | aiProcess_FlipUVs);
-    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-    {
-        std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
-        return -1;
-    }
+    std::vector<model> models = Importer::import("tic_tac_toe.obj");
 
-    std::vector<model> models = Importer::process_node(scene->mRootNode, scene);
+    model x_model     = models[0];
+    model o_model     = models[1];
+    model frame_model = models[2];
 
-    model cube_model = models[0];
-
-    VertexArray vao;
-    vao.bind();
+    VertexArray o_vao;
+    o_vao.bind();
 
     // create vbo buffer for vertices
-    Buffer vboBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, cube_model.vertices.size() * sizeof(vertex), cube_model.vertices.data());
+    Buffer o_vboBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, o_model.vertices.size() * sizeof(vertex), o_model.vertices.data());
+    Buffer o_iboBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, o_model.indices.size() * sizeof(unsigned int), o_model.indices.data());
+
+    // set vertex attributes
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    VertexArray x_vao;
+    x_vao.bind();
+
+    // create vbo buffer for vertices
+    Buffer x_vboBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, x_model.vertices.size() * sizeof(vertex), x_model.vertices.data());
+    Buffer x_iboBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, x_model.indices.size() * sizeof(unsigned int), x_model.indices.data());
+
+    // set vertex attributes
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    VertexArray frame_vao;
+    frame_vao.bind();
+
+    // create vbo buffer for vertices
+    Buffer frame_vboBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, frame_model.vertices.size() * sizeof(vertex), frame_model.vertices.data());
+    Buffer frame_iboBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, frame_model.indices.size() * sizeof(unsigned int), frame_model.indices.data());
 
     // set vertex attributes
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)0);
@@ -62,15 +79,6 @@ int main()
         float deltaTime   = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        // rotate glm matrix with delta time
-        glm::mat4 rotate    = glm::rotate(glm::mat4(1.0f), Time::getTotalTime(), glm::vec3(1.0f, 1.0f, 1.0f));
-        glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-        glm::mat4 scale     = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.5f, 0.5f));
-
-        // calculate perspective matrix with glm
-        glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
-        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
-
         // close the window on escape key
         if (window.isKeyPressed(ESC_KEY))
         {
@@ -81,16 +89,42 @@ int main()
 
         shader.use();
 
+        // calculate perspective matrix with glm
+        glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
+        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -10.0f));
+
+        glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+        glm::mat4 scale     = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.5f, 0.5f));
+
         //glm::mat4 transform = scale * rotate * translate;
-        glm::mat4 transform = translate * rotate * scale;
+        glm::mat4 transform = translate  * scale;
 
         shader.setMat4(0, glm::value_ptr(transform));
         shader.setMat4(1, glm::value_ptr(proj));
         shader.setMat4(2, glm::value_ptr(view));
 
-        vao.bind();
+        o_vao.bind();
+        glDrawElements(GL_TRIANGLES, o_model.indices.size(), GL_UNSIGNED_INT, 0);
 
-        glDrawArrays(GL_TRIANGLES, 0, cube_model.vertices.size());
+        translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+        scale     = glm::scale(glm::mat4(1.0f),     glm::vec3(0.5f, 0.5f, 0.5f));
+
+        transform = translate * scale;
+
+        shader.setMat4(0, glm::value_ptr(transform));
+
+        x_vao.bind();
+        glDrawElements(GL_TRIANGLES, x_model.indices.size(), GL_UNSIGNED_INT, 0);
+
+        translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+        scale     = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.5f, 0.5f));
+
+        transform = translate * scale;
+
+        shader.setMat4(0, glm::value_ptr(transform));
+
+        frame_vao.bind();
+        glDrawElements(GL_TRIANGLES, frame_model.indices.size(), GL_UNSIGNED_INT, 0);
 
         window.update();
     }
