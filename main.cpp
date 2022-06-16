@@ -18,8 +18,8 @@
 
 int main()
 {
-    const int width  = 1024;
-    const int height = 768;
+    const int width  = 1200;
+    const int height = 1200;
 
     Window window;
     window.create("Game Engine", width, height);
@@ -91,13 +91,9 @@ int main()
 
         // calculate perspective matrix with glm
         glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
-        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -10.0f));
+        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -31.0f));
 
-        glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-        glm::mat4 scale     = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.5f, 0.5f));
-
-        //glm::mat4 transform = scale * rotate * translate;
-        glm::mat4 transform = translate  * scale;
+        glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
         shader.setMat4(0, glm::value_ptr(transform));
         shader.setMat4(1, glm::value_ptr(proj));
@@ -106,21 +102,13 @@ int main()
         o_vao.bind();
         glDrawElements(GL_TRIANGLES, o_model.indices.size(), GL_UNSIGNED_INT, 0);
 
-        translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-        scale     = glm::scale(glm::mat4(1.0f),     glm::vec3(0.5f, 0.5f, 0.5f));
-
-        transform = translate * scale;
-
+        transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         shader.setMat4(0, glm::value_ptr(transform));
 
         x_vao.bind();
         glDrawElements(GL_TRIANGLES, x_model.indices.size(), GL_UNSIGNED_INT, 0);
 
-        translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-        scale     = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.5f, 0.5f));
-
-        transform = translate * scale;
-
+        transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         shader.setMat4(0, glm::value_ptr(transform));
 
         frame_vao.bind();
