@@ -2,8 +2,8 @@
 
 #include "vec3.hpp"
 
-struct vertex
+struct light
 {
     vec3 position;
-    vec3 normal;
+    vec3 color;
 };

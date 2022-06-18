@@ -45,8 +45,11 @@ int main()
     Buffer merged_ibo(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, merged.indices.size() * sizeof(unsigned int), merged.indices.data());
 
     // set vertex attributes
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)offsetof(vertex, position));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)offsetof(vertex, normal));
+
     glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
 
     Mesh merged_mesh;
     merged_mesh.vao       = &merged_vao;
@@ -138,10 +141,16 @@ int main()
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0f);
 
+        glm::vec3 light_color    = glm::vec3(1.0f, 1.0f, 1.0f);
+        glm::vec3 light_position = glm::vec3(0.0f, 0.0f, 8.0f);
+
         shader.setMat4(0, glm::value_ptr(transform));
         shader.setMat4(1, glm::value_ptr(proj));
         shader.setMat4(2, glm::value_ptr(view));
         shader.setVec3(3, glm::value_ptr(color));
+
+        shader.setVec3(4, glm::value_ptr(light_color));
+        shader.setVec3(5, glm::value_ptr(light_position));
 
         #if LOAD_SINGLE_VBO
 

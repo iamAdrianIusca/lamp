@@ -51,9 +51,12 @@ model Importer::process_mesh(const aiMesh* pMesh)
 
     for (unsigned int i = 0; i < pMesh->mNumVertices; i++)
     {
-        const aiVector3D& pos = pMesh->mVertices[i];
+        const aiVector3D& position = pMesh->mVertices[i];
+        const aiVector3D& normal   = pMesh->mNormals[i];
 
-        vertices.push_back({ pos.x, pos.y, pos.z });
+        vertices.push_back({ position.x, position.y, position.z,
+                             normal.x,   normal.y,   normal.z
+        });
     }
 
     std::vector<unsigned int> indices;
