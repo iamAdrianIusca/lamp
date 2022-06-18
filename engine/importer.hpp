@@ -1,5 +1,6 @@
 #pragma once
 
+#include "model.hpp"
 #include "vertex.hpp"
 #include "mesh.hpp"
 
@@ -8,15 +9,6 @@
 #include <assimp/postprocess.h>
 
 #include <vector>
-
-struct model
-{
-    std::vector<vertex>       vertices;
-    std::vector<unsigned int> indices;
-    std::vector<submesh>      submeshes;
-
-    static model merge(const std::vector<model>& models, bool single);
-};
 
 class Importer
 {

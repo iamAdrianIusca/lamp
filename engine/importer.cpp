@@ -2,11 +2,12 @@
 
 #include <iostream>
 
-std::vector<model> Importer::import(const std::string &path)
+std::vector<model> Importer::import(const std::string& path)
 {
     Assimp::Importer importer;
 
-    const aiScene* scene = importer.ReadFile("tic_tac_toe.obj", aiProcess_Triangulate | aiProcess_FlipUVs);
+    const auto* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
@@ -16,14 +17,14 @@ std::vector<model> Importer::import(const std::string &path)
     return process_node(scene->mRootNode, scene);
 }
 
-std::vector<model> Importer::process_node(aiNode *pNode, const aiScene *pScene)
+std::vector<model> Importer::process_node(aiNode* pNode, const aiScene *pScene)
 {
     std::vector<model> models;
 
     // process all meshes in node
     for (unsigned int i = 0; i < pNode->mNumMeshes; i++)
     {
-        const aiMesh* mesh = pScene->mMeshes[pNode->mMeshes[i]];
+        const auto* mesh = pScene->mMeshes[pNode->mMeshes[i]];
 
         models.push_back(process_mesh(mesh));
     }
@@ -31,19 +32,20 @@ std::vector<model> Importer::process_node(aiNode *pNode, const aiScene *pScene)
     // process all children nodes
     for (unsigned int i = 0; i < pNode->mNumChildren; i++)
     {
-        std::vector<model> child_models = process_node(pNode->mChildren[i], pScene);
+        auto children = process_node(pNode->mChildren[i], pScene);
 
-        models.insert(models.end(), child_models.begin(),
-                                    child_models.end());
+        models.insert(models.end(), children.begin(),
+                                    children.end());
     }
 
     return models;
 }
 
-model Importer::process_mesh(const aiMesh *pMesh)
+model Importer::process_mesh(const aiMesh* pMesh)
 {
-    // process vertices
     std::vector<vertex> vertices;
+    vertices.reserve(pMesh->mNumVertices);
+
     for (unsigned int i = 0; i < pMesh->mNumVertices; i++)
     {
         const aiVector3D& pos = pMesh->mVertices[i];
@@ -51,12 +53,13 @@ model Importer::process_mesh(const aiMesh *pMesh)
         vertices.push_back({ pos.x, pos.y, pos.z });
     }
 
-    // process indices
     std::vector<unsigned int> indices;
+    indices.reserve(pMesh->mNumFaces * 3);
+
     for (unsigned int i = 0; i < pMesh->mNumFaces; i++)
     {
         const aiFace& face = pMesh->mFaces[i];
-        for (unsigned int j = 0; j < face.mNumIndices; j++)
+        for (unsigned int j = 0; j < 3; j++)
         {
             indices.push_back(face.mIndices[j]);
         }
@@ -68,39 +71,4 @@ model Importer::process_mesh(const aiMesh *pMesh)
     model.submeshes.push_back({ 0, static_cast<int>(indices.size()) });
 
     return model;
-}
-
-model model::merge(const std::vector<model>& models, const bool single)
-{
-    model merged;
-
-    unsigned int size   = 0;
-    unsigned int offset = 0;
-
-    for (const auto& model : models)
-    {
-        merged.vertices.insert(merged.vertices.end(), model.vertices.begin(),
-                                                      model.vertices.end());
-        for (const unsigned int index : model.indices)
-        {
-            merged.indices.push_back(index + size);
-        }
-
-        size += static_cast<unsigned int>(model.vertices.size());
-
-        if (!single)
-        {
-            merged.submeshes.push_back({ static_cast<unsigned int>(offset * sizeof(unsigned int)),
-                                         static_cast<int>(model.indices.size()) });
-
-            offset += static_cast<unsigned int>(model.indices.size());
-        }
-    }
-
-    if (single)
-    {
-        merged.submeshes.push_back({ 0, static_cast<int>(merged.indices.size()) });
-    }
-
-    return merged;
 }
