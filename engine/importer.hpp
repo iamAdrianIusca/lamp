@@ -15,7 +15,7 @@ struct model
     std::vector<unsigned int> indices;
     std::vector<submesh>      submeshes;
 
-    static model merge(const std::vector<model>& models, bool single_submesh);
+    static model merge(const std::vector<model>& models, bool single);
 };
 
 class Importer
@@ -25,5 +25,5 @@ public:
 
 private:
     static std::vector<model> process_node(aiNode *pNode, const aiScene *pScene);
-    static model process_mesh(aiMesh *pMesh, const aiScene *pScene);
+    static model              process_mesh(const aiMesh *pMesh);
 };

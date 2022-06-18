@@ -23,21 +23,24 @@ std::vector<model> Importer::process_node(aiNode *pNode, const aiScene *pScene)
     // process all meshes in node
     for (unsigned int i = 0; i < pNode->mNumMeshes; i++)
     {
-        aiMesh* mesh = pScene->mMeshes[pNode->mMeshes[i]];
-        models.push_back(process_mesh(mesh, pScene));
+        const aiMesh* mesh = pScene->mMeshes[pNode->mMeshes[i]];
+
+        models.push_back(process_mesh(mesh));
     }
 
     // process all children nodes
     for (unsigned int i = 0; i < pNode->mNumChildren; i++)
     {
         std::vector<model> child_models = process_node(pNode->mChildren[i], pScene);
-        models.insert(models.end(), child_models.begin(), child_models.end());
+
+        models.insert(models.end(), child_models.begin(),
+                                    child_models.end());
     }
 
     return models;
 }
 
-model Importer::process_mesh(aiMesh *pMesh, const aiScene *pScene)
+model Importer::process_mesh(const aiMesh *pMesh)
 {
     // process vertices
     std::vector<vertex> vertices;
@@ -62,12 +65,12 @@ model Importer::process_mesh(aiMesh *pMesh, const aiScene *pScene)
     model model;
     model.vertices = vertices;
     model.indices  = indices;
-    model.submeshes.push_back({ 0, (unsigned int)indices.size() });
+    model.submeshes.push_back({ 0, static_cast<int>(indices.size()) });
 
     return model;
 }
 
-model model::merge(const std::vector<model>& models, bool single_submesh)
+model model::merge(const std::vector<model>& models, const bool single)
 {
     model merged;
 
@@ -78,24 +81,25 @@ model model::merge(const std::vector<model>& models, bool single_submesh)
     {
         merged.vertices.insert(merged.vertices.end(), model.vertices.begin(),
                                                       model.vertices.end());
-        for (unsigned int index : model.indices)
+        for (const unsigned int index : model.indices)
         {
             merged.indices.push_back(index + size);
         }
 
-        size += (unsigned int)model.vertices.size();
+        size += static_cast<unsigned int>(model.vertices.size());
 
-        if (!single_submesh)
+        if (!single)
         {
-            merged.submeshes.push_back({ offset, (unsigned int)model.indices.size() });
+            merged.submeshes.push_back({ static_cast<unsigned int>(offset * sizeof(unsigned int)),
+                                         static_cast<int>(model.indices.size()) });
 
-            offset += (unsigned int)model.indices.size();
+            offset += static_cast<unsigned int>(model.indices.size());
         }
     }
 
-    if (single_submesh)
+    if (single)
     {
-        merged.submeshes.push_back({ 0, (unsigned int)merged.indices.size() });
+        merged.submeshes.push_back({ 0, static_cast<int>(merged.indices.size()) });
     }
 
     return merged;

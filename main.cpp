@@ -17,8 +17,8 @@
 #include "importer.hpp"
 #include "mesh.hpp"
 
-#define LOAD_SINGLE_VBO  false
-#define LOAD_SINGLE_MESH true
+#define LOAD_SINGLE_VBO  true
+#define LOAD_SINGLE_MESH false
 
 int main()
 {
@@ -59,6 +59,7 @@ int main()
     model frame_model = models[2];
 
     VertexArray o_vao;
+    o_vao.init();
     o_vao.bind();
 
     // create vbo buffer for vertices
@@ -74,6 +75,7 @@ int main()
     o_mesh.submeshes = o_model.submeshes;
 
     VertexArray x_vao;
+    x_vao.init();
     x_vao.bind();
 
     // create vbo buffer for vertices
@@ -89,6 +91,7 @@ int main()
     x_mesh.submeshes = x_model.submeshes;
 
     VertexArray frame_vao;
+    frame_vao.init();
     frame_vao.bind();
 
     // create vbo buffer for vertices

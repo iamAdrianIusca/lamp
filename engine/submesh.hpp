@@ -3,5 +3,5 @@
 struct submesh
 {
     unsigned int index;
-    unsigned int count;
+    int count;
 };
