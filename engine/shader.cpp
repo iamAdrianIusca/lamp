@@ -50,3 +50,8 @@ void Shader::setMat4(int index, float* data)
     glUniformMatrix4fv(index, 1, GL_FALSE, data);
 }
 
+void Shader::setVec3(int index, float *data)
+{
+    glUniform3fv(index, 1, data);
+}
+

@@ -17,4 +17,5 @@ public:
     void setFloat(const std::string& name, float value) const;
 
     void setMat4(int index, float* data);
+    void setVec3(int index, float* data);
 };
