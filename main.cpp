@@ -15,6 +15,7 @@
 #include "time.hpp"
 #include "file.hpp"
 #include "importer.hpp"
+#include "mesh.hpp"
 
 int main()
 {
@@ -43,6 +44,10 @@ int main()
     // set vertex attributes
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)0);
     glEnableVertexAttribArray(0);
+
+    Mesh o_mesh;
+    o_mesh.vao = o_vao;
+    o_mesh.submeshes.push_back({ 0, (unsigned int)o_model.indices.size() });
 
     VertexArray x_vao;
     x_vao.bind();
@@ -99,8 +104,8 @@ int main()
         shader.setMat4(1, glm::value_ptr(proj));
         shader.setMat4(2, glm::value_ptr(view));
 
-        o_vao.bind();
-        glDrawElements(GL_TRIANGLES, o_model.indices.size(), GL_UNSIGNED_INT, 0);
+        o_mesh.bind();
+        o_mesh.draw(0);
 
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         shader.setMat4(0, glm::value_ptr(transform));
