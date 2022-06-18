@@ -15,7 +15,7 @@ struct model
     std::vector<unsigned int> indices;
     std::vector<submesh>      submeshes;
 
-    static model merge(std::vector<model> models);
+    static model merge(const std::vector<model>& models, bool single_submesh);
 };
 
 class Importer

@@ -67,24 +67,35 @@ model Importer::process_mesh(aiMesh *pMesh, const aiScene *pScene)
     return model;
 }
 
-model model::merge(std::vector<model> models)
+model model::merge(const std::vector<model>& models, bool single_submesh)
 {
     model merged;
 
-    // merge vertices
-    for (auto& model : models)
+    unsigned int size   = 0;
+    unsigned int offset = 0;
+
+    for (const auto& model : models)
     {
-        merged.vertices.insert(merged.vertices.end(), model.vertices.begin(), model.vertices.end());
+        merged.vertices.insert(merged.vertices.end(), model.vertices.begin(),
+                                                      model.vertices.end());
+        for (unsigned int index : model.indices)
+        {
+            merged.indices.push_back(index + size);
+        }
+
+        size += (unsigned int)model.vertices.size();
+
+        if (!single_submesh)
+        {
+            merged.submeshes.push_back({ offset, (unsigned int)model.indices.size() });
+
+            offset += (unsigned int)model.indices.size();
+        }
     }
 
-    // merge submeshes based on the indices
-    for (auto& model : models)
+    if (single_submesh)
     {
-        for (auto& submesh : model.submeshes)
-        {
-            merged.submeshes.push_back({ (unsigned int)merged.indices.size(), submesh.count });
-            merged.indices.insert(merged.indices.end(), model.indices.begin() + submesh.index, model.indices.begin() + submesh.index + submesh.count);
-        }
+        merged.submeshes.push_back({ 0, (unsigned int)merged.indices.size() });
     }
 
     return merged;

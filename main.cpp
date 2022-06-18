@@ -17,6 +17,9 @@
 #include "importer.hpp"
 #include "mesh.hpp"
 
+#define LOAD_SINGLE_VBO  false
+#define LOAD_SINGLE_MESH true
+
 int main()
 {
     const int width  = 1200;
@@ -30,17 +33,15 @@ int main()
 
     std::vector<model> models = Importer::import("tic_tac_toe.obj");
 
-    model x_model     = models[0];
-    model o_model     = models[1];
-    model frame_model = models[2];
+    #if LOAD_SINGLE_VBO
 
-    model merged = model::merge(models);
+    model merged = model::merge(models, LOAD_SINGLE_MESH);
 
     VertexArray merged_vao;
     merged_vao.init();
     merged_vao.bind();
 
-    Buffer merged_vbo(GL_ARRAY_BUFFER, GL_STATIC_DRAW,         merged.vertices.size() * sizeof(vertex),      merged.vertices.data());
+    Buffer merged_vbo(GL_ARRAY_BUFFER,         GL_STATIC_DRAW, merged.vertices.size() * sizeof(vertex),      merged.vertices.data());
     Buffer merged_ibo(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, merged.indices.size() * sizeof(unsigned int), merged.indices.data());
 
     // set vertex attributes
@@ -51,11 +52,17 @@ int main()
     merged_mesh.vao       = &merged_vao;
     merged_mesh.submeshes = merged.submeshes;
 
+    #else
+
+    model x_model     = models[0];
+    model o_model     = models[1];
+    model frame_model = models[2];
+
     VertexArray o_vao;
     o_vao.bind();
 
     // create vbo buffer for vertices
-    Buffer o_vboBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW,         o_model.vertices.size() * sizeof(vertex),      o_model.vertices.data());
+    Buffer o_vboBuffer(GL_ARRAY_BUFFER,         GL_STATIC_DRAW, o_model.vertices.size() * sizeof(vertex),      o_model.vertices.data());
     Buffer o_iboBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, o_model.indices.size() * sizeof(unsigned int), o_model.indices.data());
 
     // set vertex attributes
@@ -70,7 +77,7 @@ int main()
     x_vao.bind();
 
     // create vbo buffer for vertices
-    Buffer x_vboBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW,         x_model.vertices.size() * sizeof(vertex),      x_model.vertices.data());
+    Buffer x_vboBuffer(GL_ARRAY_BUFFER,         GL_STATIC_DRAW, x_model.vertices.size() * sizeof(vertex),      x_model.vertices.data());
     Buffer x_iboBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, x_model.indices.size() * sizeof(unsigned int), x_model.indices.data());
 
     // set vertex attributes
@@ -85,7 +92,7 @@ int main()
     frame_vao.bind();
 
     // create vbo buffer for vertices
-    Buffer frame_vboBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW,         frame_model.vertices.size() * sizeof(vertex),      frame_model.vertices.data());
+    Buffer frame_vboBuffer(GL_ARRAY_BUFFER,         GL_STATIC_DRAW, frame_model.vertices.size() * sizeof(vertex),      frame_model.vertices.data());
     Buffer frame_iboBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, frame_model.indices.size() * sizeof(unsigned int), frame_model.indices.data());
 
     // set vertex attributes
@@ -95,6 +102,8 @@ int main()
     Mesh frame_mesh;
     frame_mesh.vao       = &frame_vao;
     frame_mesh.submeshes = frame_model.submeshes;
+
+    #endif
 
     // initialize delta time
     float lastFrame = 0.0f;
@@ -131,30 +140,55 @@ int main()
         shader.setMat4(2, glm::value_ptr(view));
         shader.setVec3(3, glm::value_ptr(color));
 
+        #if LOAD_SINGLE_VBO
+
         merged_mesh.bind();
         merged_mesh.draw(0);
-        //o_mesh.bind();
-        //o_mesh.draw(0);
+
+        #else
+
+        o_mesh.bind();
+        o_mesh.draw(0);
+
+        #endif
 
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-        color = glm::vec3(0.0f, 1.0f, 0.0f);
+        color     = glm::vec3(0.0f, 1.0f, 0.0f);
 
         shader.setMat4(0, glm::value_ptr(transform));
         shader.setVec3(3, glm::value_ptr(color));
 
-        //x_mesh.bind();
-        //x_mesh.draw(0);
+        #if  LOAD_SINGLE_VBO
+        #if !LOAD_SINGLE_MESH
+
         merged_mesh.draw(1);
 
+        #endif
+        #else
+
+        x_mesh.bind();
+        x_mesh.draw(0);
+
+        #endif
+
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-        color = glm::vec3(0.0f, 0.0f, 1.0f);
+        color     = glm::vec3(0.0f, 0.0f, 1.0f);
 
         shader.setMat4(0, glm::value_ptr(transform));
         shader.setVec3(3, glm::value_ptr(color));
 
-        //frame_mesh.bind();
-        //frame_mesh.draw(0);
+        #if  LOAD_SINGLE_VBO
+        #if !LOAD_SINGLE_MESH
+
         merged_mesh.draw(2);
+
+        #endif
+        #else
+
+        frame_mesh.bind();
+        frame_mesh.draw(0);
+
+        #endif
 
         window.update();
     }

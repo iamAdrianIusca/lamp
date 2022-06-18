@@ -7,9 +7,9 @@
 
 struct Mesh
 {
-    std::vector<submesh> submeshes;
     VertexArray*         vao;
+    std::vector<submesh> submeshes;
 
-    void bind() const;
+    void bind()          const;
     void draw(int index) const;
 };
