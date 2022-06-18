@@ -34,6 +34,23 @@ int main()
     model o_model     = models[1];
     model frame_model = models[2];
 
+    model merged = model::merge(models);
+
+    VertexArray merged_vao;
+    merged_vao.init();
+    merged_vao.bind();
+
+    Buffer merged_vbo(GL_ARRAY_BUFFER, GL_STATIC_DRAW,         merged.vertices.size() * sizeof(vertex),      merged.vertices.data());
+    Buffer merged_ibo(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, merged.indices.size() * sizeof(unsigned int), merged.indices.data());
+
+    // set vertex attributes
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    Mesh merged_mesh;
+    merged_mesh.vao       = &merged_vao;
+    merged_mesh.submeshes = merged.submeshes;
+
     VertexArray o_vao;
     o_vao.bind();
 
@@ -46,8 +63,8 @@ int main()
     glEnableVertexAttribArray(0);
 
     Mesh o_mesh;
-    o_mesh.vao = o_vao;
-    o_mesh.submeshes.push_back({ 0, (unsigned int)o_model.indices.size() });
+    o_mesh.vao       = &o_vao;
+    o_mesh.submeshes = o_model.submeshes;
 
     VertexArray x_vao;
     x_vao.bind();
@@ -61,8 +78,8 @@ int main()
     glEnableVertexAttribArray(0);
 
     Mesh x_mesh;
-    x_mesh.vao = x_vao;
-    x_mesh.submeshes.push_back({ 0, (unsigned int)x_model.indices.size() });
+    x_mesh.vao       = &x_vao;
+    x_mesh.submeshes = x_model.submeshes;
 
     VertexArray frame_vao;
     frame_vao.bind();
@@ -76,8 +93,8 @@ int main()
     glEnableVertexAttribArray(0);
 
     Mesh frame_mesh;
-    frame_mesh.vao = frame_vao;
-    frame_mesh.submeshes.push_back({ 0, (unsigned int)frame_model.indices.size() });
+    frame_mesh.vao       = &frame_vao;
+    frame_mesh.submeshes = frame_model.submeshes;
 
     // initialize delta time
     float lastFrame = 0.0f;
@@ -114,8 +131,10 @@ int main()
         shader.setMat4(2, glm::value_ptr(view));
         shader.setVec3(3, glm::value_ptr(color));
 
-        o_mesh.bind();
-        o_mesh.draw(0);
+        merged_mesh.bind();
+        merged_mesh.draw(0);
+        //o_mesh.bind();
+        //o_mesh.draw(0);
 
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         color = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -123,8 +142,9 @@ int main()
         shader.setMat4(0, glm::value_ptr(transform));
         shader.setVec3(3, glm::value_ptr(color));
 
-        x_mesh.bind();
-        x_mesh.draw(0);
+        //x_mesh.bind();
+        //x_mesh.draw(0);
+        merged_mesh.draw(1);
 
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         color = glm::vec3(0.0f, 0.0f, 1.0f);
@@ -132,8 +152,9 @@ int main()
         shader.setMat4(0, glm::value_ptr(transform));
         shader.setVec3(3, glm::value_ptr(color));
 
-        frame_mesh.bind();
-        frame_mesh.draw(0);
+        //frame_mesh.bind();
+        //frame_mesh.draw(0);
+        merged_mesh.draw(2);
 
         window.update();
     }

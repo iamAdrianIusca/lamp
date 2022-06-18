@@ -62,6 +62,30 @@ model Importer::process_mesh(aiMesh *pMesh, const aiScene *pScene)
     model model;
     model.vertices = vertices;
     model.indices  = indices;
+    model.submeshes.push_back({ 0, (unsigned int)indices.size() });
 
     return model;
+}
+
+model model::merge(std::vector<model> models)
+{
+    model merged;
+
+    // merge vertices
+    for (auto& model : models)
+    {
+        merged.vertices.insert(merged.vertices.end(), model.vertices.begin(), model.vertices.end());
+    }
+
+    // merge submeshes based on the indices
+    for (auto& model : models)
+    {
+        for (auto& submesh : model.submeshes)
+        {
+            merged.submeshes.push_back({ (unsigned int)merged.indices.size(), submesh.count });
+            merged.indices.insert(merged.indices.end(), model.indices.begin() + submesh.index, model.indices.begin() + submesh.index + submesh.count);
+        }
+    }
+
+    return merged;
 }

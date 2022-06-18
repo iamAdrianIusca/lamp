@@ -18,4 +18,7 @@ public:
 
     void setMat4(int index, float* data);
     void setVec3(int index, float* data);
+
+    void init()    { }
+    void release() { }
 };

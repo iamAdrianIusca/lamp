@@ -10,8 +10,10 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath)
     ShaderStage fragmentShader(fragmentPath, GL_FRAGMENT_SHADER);
 
     _handle = glCreateProgram();
-    glAttachShader(_handle, vertexShader.get_id());
-    glAttachShader(_handle, fragmentShader.get_id());
+
+    glAttachShader(_handle, vertexShader.handle());
+    glAttachShader(_handle, fragmentShader.handle());
+
     glLinkProgram(_handle);
 
     int success;

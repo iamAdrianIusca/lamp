@@ -5,8 +5,7 @@
 class VertexArray final : public Object
 {
 public:
-    VertexArray();
-    ~VertexArray() = default;
-
-    void bind() const;
+    void init()    final;
+    void release() final;
+    void bind()    const;
 };

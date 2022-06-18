@@ -10,6 +10,9 @@ public:
 
 	void bind() const;
 
+	void init()    { }
+	void release() { }
+
 private:
     unsigned int m_type;
 };

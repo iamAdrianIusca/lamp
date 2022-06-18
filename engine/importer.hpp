@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vertex.hpp"
+#include "mesh.hpp"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -12,6 +13,9 @@ struct model
 {
     std::vector<vertex>       vertices;
     std::vector<unsigned int> indices;
+    std::vector<submesh>      submeshes;
+
+    static model merge(std::vector<model> models);
 };
 
 class Importer

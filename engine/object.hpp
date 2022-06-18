@@ -3,7 +3,10 @@
 class Object
 {
 public:
-    unsigned int get_id() const;
+    virtual void init()    = 0;
+    virtual void release() = 0;
+
+    unsigned int handle() const;
 
 protected:
     unsigned int _handle;
