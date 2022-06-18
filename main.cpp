@@ -22,8 +22,8 @@
 
 int main()
 {
-    const int width  = 1200;
-    const int height = 1200;
+    const int width  = 1000;
+    const int height = 1000;
 
     Window window;
     window.create("Game Engine", width, height);

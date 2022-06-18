@@ -3,13 +3,14 @@
 #include <glad/glad.h>
 #include <iostream>
 
-ShaderStage::ShaderStage(const char *data, int type)
+ShaderStage::ShaderStage(const char* data, const int type)
 {
     _handle = glCreateShader(type);
+
     glShaderSource(_handle, 1, &data, nullptr);
     glCompileShader(_handle);
 
-    int success;
+    int  success;
     char infoLog[512];
 
     glGetShaderiv(_handle, GL_COMPILE_STATUS, &success);

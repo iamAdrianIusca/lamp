@@ -6,7 +6,7 @@
 
 Shader::Shader(const char *vertexPath, const char *fragmentPath)
 {
-    ShaderStage vertexShader(vertexPath, GL_VERTEX_SHADER);
+    ShaderStage vertexShader(vertexPath,     GL_VERTEX_SHADER);
     ShaderStage fragmentShader(fragmentPath, GL_FRAGMENT_SHADER);
 
     _handle = glCreateProgram();

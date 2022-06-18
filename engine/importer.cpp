@@ -20,6 +20,7 @@ std::vector<model> Importer::import(const std::string& path)
 std::vector<model> Importer::process_node(aiNode* pNode, const aiScene *pScene)
 {
     std::vector<model> models;
+    models.reserve(pNode->mNumMeshes);
 
     // process all meshes in node
     for (unsigned int i = 0; i < pNode->mNumMeshes; i++)
@@ -43,6 +44,8 @@ std::vector<model> Importer::process_node(aiNode* pNode, const aiScene *pScene)
 
 model Importer::process_mesh(const aiMesh* pMesh)
 {
+    constexpr int32_t triangle_vertices = 3;
+
     std::vector<vertex> vertices;
     vertices.reserve(pMesh->mNumVertices);
 
@@ -54,12 +57,12 @@ model Importer::process_mesh(const aiMesh* pMesh)
     }
 
     std::vector<unsigned int> indices;
-    indices.reserve(pMesh->mNumFaces * 3);
+    indices.reserve(pMesh->mNumFaces * triangle_vertices);
 
     for (unsigned int i = 0; i < pMesh->mNumFaces; i++)
     {
         const aiFace& face = pMesh->mFaces[i];
-        for (unsigned int j = 0; j < 3; j++)
+        for (unsigned int j = 0; j < triangle_vertices; j++)
         {
             indices.push_back(face.mIndices[j]);
         }
