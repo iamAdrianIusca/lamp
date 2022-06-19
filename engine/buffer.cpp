@@ -14,3 +14,8 @@ void Buffer::bind() const
 {
     glBindBuffer(m_type, _handle);
 }
+
+void Buffer::bind(uint32_t index) const
+{
+    glBindBufferBase(m_type, index, _handle);
+}

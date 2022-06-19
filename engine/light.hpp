@@ -1,9 +1,11 @@
 #pragma once
 
 #include "vec3.hpp"
+#include "rgb.hpp"
 
 struct light
 {
     vec3 position;
-    vec3 color;
+    float tmp;
+    rgb  color;
 };

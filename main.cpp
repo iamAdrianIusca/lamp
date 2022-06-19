@@ -16,6 +16,7 @@
 #include "file.hpp"
 #include "importer.hpp"
 #include "mesh.hpp"
+#include "light.hpp"
 
 #define LOAD_SINGLE_VBO  true
 #define LOAD_SINGLE_MESH false
@@ -111,6 +112,11 @@ int main()
 
     #endif
 
+    light light { { 0.0f, 0.0f, 8.0f }, 1.0f, { 1.0f, 1.0f, 1.0f } };
+
+    Buffer light_ubo(GL_UNIFORM_BUFFER, GL_STATIC_DRAW, sizeof(light), &light);
+    light_ubo.bind(0);
+
     // initialize delta time
     float lastFrame = 0.0f;
 
@@ -141,16 +147,10 @@ int main()
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0f);
 
-        glm::vec3 light_color    = glm::vec3(1.0f, 1.0f, 1.0f);
-        glm::vec3 light_position = glm::vec3(0.0f, 0.0f, 8.0f);
-
         shader.setMat4(0, glm::value_ptr(transform));
         shader.setMat4(1, glm::value_ptr(proj));
         shader.setMat4(2, glm::value_ptr(view));
         shader.setVec3(3, glm::value_ptr(color));
-
-        shader.setVec3(4, glm::value_ptr(light_color));
-        shader.setVec3(5, glm::value_ptr(light_position));
 
         #if LOAD_SINGLE_VBO
 
