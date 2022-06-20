@@ -5,7 +5,7 @@ layout (location = 1) in vec3 in_normal;
 
 layout (location = 3) uniform vec3 u_color;
 
-layout (std140, binding = 0) uniform light
+layout (std140, binding = 1) uniform light
 {
     vec3 position;
     float tmp;

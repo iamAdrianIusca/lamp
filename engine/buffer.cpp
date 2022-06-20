@@ -1,21 +1,24 @@
 #include "buffer.hpp"
 
 #include <glad/glad.h>
+#include <cassert>
 
-Buffer::Buffer(unsigned int type, unsigned int usage, unsigned int size, void *data)
-    : m_type { type }
+Buffer::Buffer(uint32_t type, uint32_t usage, uint32_t size, void *data)
+    : _type { type }
 {
     glGenBuffers(1, &_handle);
-    glBindBuffer(m_type, _handle);
-    glBufferData(m_type, size, data, usage);
+    glBindBuffer(_type, _handle);
+    glBufferData(_type, size, data, usage);
 }
 
 void Buffer::bind() const
 {
-    glBindBuffer(m_type, _handle);
+    glBindBuffer(_type, _handle);
 }
 
 void Buffer::bind(uint32_t index) const
 {
-    glBindBufferBase(m_type, index, _handle);
+    assert(_type == GL_UNIFORM_BUFFER);
+
+    glBindBufferBase(_type, index, _handle);
 }

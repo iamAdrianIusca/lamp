@@ -17,6 +17,7 @@
 #include "importer.hpp"
 #include "mesh.hpp"
 #include "light.hpp"
+#include "camera.hpp"
 
 #define LOAD_SINGLE_VBO  true
 #define LOAD_SINGLE_MESH false
@@ -42,8 +43,8 @@ int main()
     merged_vao.init();
     merged_vao.bind();
 
-    Buffer merged_vbo(GL_ARRAY_BUFFER,         GL_STATIC_DRAW, merged.vertices.size() * sizeof(vertex),      merged.vertices.data());
-    Buffer merged_ibo(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, merged.indices.size() * sizeof(unsigned int), merged.indices.data());
+    Buffer merged_vbo(GL_ARRAY_BUFFER,         GL_STATIC_DRAW, merged.vertices.size() * sizeof(vertex),  merged.vertices.data());
+    Buffer merged_ibo(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, merged.indices.size() * sizeof(uint32_t), merged.indices.data());
 
     // set vertex attributes
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)offsetof(vertex, position));
@@ -112,10 +113,17 @@ int main()
 
     #endif
 
-    light light { { 0.0f, 0.0f, 8.0f }, 1.0f, { 1.0f, 1.0f, 1.0f } };
+    light  light { { 0.0f, 0.0f, 8.0f }, 1.0f, { 1.0f, 1.0f, 1.0f } };
 
     Buffer light_ubo(GL_UNIFORM_BUFFER, GL_STATIC_DRAW, sizeof(light), &light);
-    light_ubo.bind(0);
+    light_ubo.bind(1);
+
+    data::camera camera;
+    camera.projection = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
+    camera.view       = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -31.0f));
+
+    Buffer camera_ubo(GL_UNIFORM_BUFFER, GL_STATIC_DRAW, sizeof(camera), &camera);
+    camera_ubo.bind(0);
 
     // initialize delta time
     float lastFrame = 0.0f;
@@ -140,16 +148,10 @@ int main()
 
         shader.use();
 
-        // calculate perspective matrix with glm
-        glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
-        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -31.0f));
-
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-        glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0f);
+        glm::vec3 color     = glm::vec3(1.0f, 0.0f, 0.0f);
 
         shader.setMat4(0, glm::value_ptr(transform));
-        shader.setMat4(1, glm::value_ptr(proj));
-        shader.setMat4(2, glm::value_ptr(view));
         shader.setVec3(3, glm::value_ptr(color));
 
         #if LOAD_SINGLE_VBO

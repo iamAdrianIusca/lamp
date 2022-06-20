@@ -7,7 +7,7 @@
 class Buffer final : public Object
 {
 public:
-	Buffer(unsigned int type, unsigned int usage, unsigned int size, void* data);
+	Buffer(uint32_t type, uint32_t usage, uint32_t size, void* data);
 	~Buffer() = default;
 
 	void bind()               const;
@@ -17,5 +17,5 @@ public:
 	void release() { }
 
 private:
-    unsigned int m_type;
+    uint32_t _type;
 };
