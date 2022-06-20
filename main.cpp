@@ -18,8 +18,7 @@
 #include "mesh.hpp"
 #include "light.hpp"
 #include "camera.hpp"
-
-#include <btBulletCollisionCommon.h>
+#include "physics.hpp"
 
 #define LOAD_SINGLE_VBO  true
 #define LOAD_SINGLE_MESH false
@@ -142,38 +141,30 @@ int main()
     bt_transform.setIdentity();
 
     auto bt_box   = new btCollisionObject();
-    auto bt_shape = new btBoxShape(btVector3(0.15f, 0.15f, 0.15f));
+    auto bt_shape = new btBoxShape(btVector3(2.80f, 2.80f, 1.0f));
 
     bt_box->setCollisionShape(bt_shape);
     bt_box->setWorldTransform(bt_transform);
     bt_world->addCollisionObject(bt_box);
 
+    glm::vec4 viewport = glm::vec4(0.0f, 0.0f, width, height);
+
     // show the window
     while (!window.isClosed())
     {
+        bool yellow = false;
+
         if (window.isMousePressed(GLFW_MOUSE_BUTTON_LEFT))
         {
-            glm::vec2 mouse_position = window.mouse_position();
+            glm::vec2 mouse = window.mouse_position();
 
-            const float x =  (mouse_position.x / width - 0.5f) * 2.0f;
-            const float y = -(mouse_position.y / height - 0.5f) * 2.0f;
-
-            // transform mouse position to world space
-            glm::vec3 world_position = glm::unProject(glm::vec3(x, y, 0.0f),
-                                                      camera.view, camera.projection,
-                                                      glm::vec4(0.0f, 0.0f, width, height));
-            float distance = 50;
-
-            btVector3 origin(world_position.x, world_position.y, world_position.z);
-            btVector3 direction(0, 0, -1);
-            btVector3 end = origin + (direction * distance);
-
-            btCollisionWorld::ClosestRayResultCallback hit(origin, end);
-            bt_world->rayTest(origin, end, hit);
+            auto ray = Physics::screen_to_world(mouse, camera, viewport);
+            auto hit = Physics::ray_cast(bt_world, ray, 50.0f);
 
             if (hit.hasHit())
             {
                 std::cout << "hit" << std::endl;
+                yellow = true;
             }
             else
             {
@@ -199,13 +190,18 @@ int main()
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         glm::vec3 color     = glm::vec3(1.0f, 0.0f, 0.0f);
 
+        if (yellow)
+        {
+            color = glm::vec3(1.0f, 0.0f, 1.0f);
+        }
+
         shader.setMat4(0, glm::value_ptr(transform));
         shader.setVec3(1, glm::value_ptr(color));
 
         #if LOAD_SINGLE_VBO
 
         merged_mesh.bind();
-        merged_mesh.draw(0);
+        merged_mesh.draw(1);
 
         #else
 
@@ -223,7 +219,7 @@ int main()
         #if  LOAD_SINGLE_VBO
         #if !LOAD_SINGLE_MESH
 
-        merged_mesh.draw(1);
+        merged_mesh.draw(0);
 
         #endif
         #else
