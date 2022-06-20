@@ -19,6 +19,8 @@
 #include "light.hpp"
 #include "camera.hpp"
 
+#include <btBulletCollisionCommon.h>
+
 #define LOAD_SINGLE_VBO  true
 #define LOAD_SINGLE_MESH false
 
@@ -130,9 +132,55 @@ int main()
 
     glEnable(GL_DEPTH_TEST);
 
+    auto bt_config     = new btDefaultCollisionConfiguration();
+    auto bt_dispatcher = new btCollisionDispatcher(bt_config);
+    auto bt_broadphase = new btDbvtBroadphase();
+
+    auto bt_world = new btCollisionWorld(bt_dispatcher, bt_broadphase, bt_config);
+
+    btTransform bt_transform;
+    bt_transform.setIdentity();
+
+    auto bt_box   = new btCollisionObject();
+    auto bt_shape = new btBoxShape(btVector3(0.15f, 0.15f, 0.15f));
+
+    bt_box->setCollisionShape(bt_shape);
+    bt_box->setWorldTransform(bt_transform);
+    bt_world->addCollisionObject(bt_box);
+
     // show the window
     while (!window.isClosed())
     {
+        if (window.isMousePressed(GLFW_MOUSE_BUTTON_LEFT))
+        {
+            glm::vec2 mouse_position = window.mouse_position();
+
+            const float x =  (mouse_position.x / width - 0.5f) * 2.0f;
+            const float y = -(mouse_position.y / height - 0.5f) * 2.0f;
+
+            // transform mouse position to world space
+            glm::vec3 world_position = glm::unProject(glm::vec3(x, y, 0.0f),
+                                                      camera.view, camera.projection,
+                                                      glm::vec4(0.0f, 0.0f, width, height));
+            float distance = 50;
+
+            btVector3 origin(world_position.x, world_position.y, world_position.z);
+            btVector3 direction(0, 0, -1);
+            btVector3 end = origin + (direction * distance);
+
+            btCollisionWorld::ClosestRayResultCallback hit(origin, end);
+            bt_world->rayTest(origin, end, hit);
+
+            if (hit.hasHit())
+            {
+                std::cout << "hit" << std::endl;
+            }
+            else
+            {
+                std::cout << "miss" << std::endl;
+            }
+        }
+
         // calculate delta time
         auto currentFrame = Time::getTotalTime();
         float deltaTime   = currentFrame - lastFrame;
@@ -152,7 +200,7 @@ int main()
         glm::vec3 color     = glm::vec3(1.0f, 0.0f, 0.0f);
 
         shader.setMat4(0, glm::value_ptr(transform));
-        shader.setVec3(3, glm::value_ptr(color));
+        shader.setVec3(1, glm::value_ptr(color));
 
         #if LOAD_SINGLE_VBO
 
@@ -170,7 +218,7 @@ int main()
         color     = glm::vec3(0.0f, 1.0f, 0.0f);
 
         shader.setMat4(0, glm::value_ptr(transform));
-        shader.setVec3(3, glm::value_ptr(color));
+        shader.setVec3(1, glm::value_ptr(color));
 
         #if  LOAD_SINGLE_VBO
         #if !LOAD_SINGLE_MESH
@@ -189,7 +237,7 @@ int main()
         color     = glm::vec3(0.0f, 0.0f, 1.0f);
 
         shader.setMat4(0, glm::value_ptr(transform));
-        shader.setVec3(3, glm::value_ptr(color));
+        shader.setVec3(1, glm::value_ptr(color));
 
         #if  LOAD_SINGLE_VBO
         #if !LOAD_SINGLE_MESH

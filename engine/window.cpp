@@ -67,7 +67,7 @@ bool Window::isClosed() const
     return m_data.isClosed || glfwWindowShouldClose(m_data.window);
 }
 
-bool Window::isKeyPressed(unsigned int keycode) const
+bool Window::isKeyPressed(int keycode) const
 {
     return glfwGetKey(m_data.window, keycode) == GLFW_PRESS;
 }
@@ -75,4 +75,17 @@ bool Window::isKeyPressed(unsigned int keycode) const
 void Window::close()
 {
     m_data.isClosed = true;
+}
+
+bool Window::isMousePressed(int button) const
+{
+    return glfwGetMouseButton(m_data.window, button) == GLFW_PRESS;
+}
+
+glm::vec2 Window::mouse_position() const
+{
+    double x, y;
+    glfwGetCursorPos(m_data.window, &x, &y);
+
+    return { x, y };
 }
