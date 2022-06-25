@@ -15,7 +15,6 @@
 #include "time.hpp"
 #include "file.hpp"
 #include "importer.hpp"
-#include "mesh.hpp"
 #include "light.hpp"
 #include "camera.hpp"
 #include "physics.hpp"
@@ -54,7 +53,7 @@ int main()
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
 
-    Mesh merged_mesh;
+    Mesh merged_mesh(GL_TRIANGLES);
     merged_mesh.vao       = &merged_vao;
     merged_mesh.submeshes = merged.submeshes;
 
@@ -147,7 +146,7 @@ int main()
     bt_box->setWorldTransform(bt_transform);
     bt_world->addCollisionObject(bt_box);
 
-    glm::vec4 viewport = glm::vec4(0.0f, 0.0f, width, height);
+    glm::vec4 viewport { 0.0f, 0.0f, width, height };
 
     // show the window
     while (!window.isClosed())
@@ -163,12 +162,7 @@ int main()
 
             if (hit.hasHit())
             {
-                std::cout << "hit" << std::endl;
                 yellow = true;
-            }
-            else
-            {
-                std::cout << "miss" << std::endl;
             }
         }
 
@@ -192,7 +186,7 @@ int main()
 
         if (yellow)
         {
-            color = glm::vec3(1.0f, 0.0f, 1.0f);
+            color = glm::vec3(1.0f, 1.0f, 0.0f);
         }
 
         shader.setMat4(0, glm::value_ptr(transform));
