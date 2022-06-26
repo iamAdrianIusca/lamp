@@ -1,0 +1,15 @@
+[submodule "libraries/glfw"]
+	path = libraries/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "libraries/glad"]
+	path = libraries/glad
+	url = https://github.com/Dav1dde/glad.git
+[submodule "libraries/glm"]
+	path = libraries/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "libraries/assimp"]
+	path = libraries/assimp
+	url = https://github.com/assimp/assimp.git
+[submodule "libraries/bullet3"]
+	path = libraries/bullet3
+	url = https://github.com/bulletphysics/bullet3.git
