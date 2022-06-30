@@ -1,11 +1,11 @@
-#include <glad/glad.h>
+#include "glad/glad.h"
 
 #include <vector>
 #include <iostream>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "glm/glm.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 #include "window.hpp"
 #include "vertex_array.hpp"
@@ -119,34 +119,25 @@ int main()
     light_ubo.bind(1);
 
     data::camera camera;
-    camera.projection = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
+    camera.projection = glm::perspective(glm::radians(45.0f), static_cast<float>(width) / static_cast<float>(height), 0.1f, 100.0f);
     camera.view       = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -31.0f));
 
     Buffer camera_ubo(GL_UNIFORM_BUFFER, GL_STATIC_DRAW, sizeof(camera), &camera);
     camera_ubo.bind(0);
 
+    Physics physics;
+    physics.init();
+
+    auto bt_shape = new btBoxShape(btVector3(2.80f, 2.80f, 1.0f));
+
+    physics.add_collision_object(bt_shape, { });
+
+    glm::vec4 viewport { 0.0f, 0.0f, width, height };
+
     // initialize delta time
     float lastFrame = 0.0f;
 
     glEnable(GL_DEPTH_TEST);
-
-    auto bt_config     = new btDefaultCollisionConfiguration();
-    auto bt_dispatcher = new btCollisionDispatcher(bt_config);
-    auto bt_broadphase = new btDbvtBroadphase();
-
-    auto bt_world = new btCollisionWorld(bt_dispatcher, bt_broadphase, bt_config);
-
-    btTransform bt_transform;
-    bt_transform.setIdentity();
-
-    auto bt_box   = new btCollisionObject();
-    auto bt_shape = new btBoxShape(btVector3(2.80f, 2.80f, 1.0f));
-
-    bt_box->setCollisionShape(bt_shape);
-    bt_box->setWorldTransform(bt_transform);
-    bt_world->addCollisionObject(bt_box);
-
-    glm::vec4 viewport { 0.0f, 0.0f, width, height };
 
     // show the window
     while (!window.isClosed())
@@ -157,8 +148,9 @@ int main()
         {
             glm::vec2 mouse = window.mouse_position();
 
+            // TODO move this function in camera together with viewport
             auto ray = Physics::screen_to_world(mouse, camera, viewport);
-            auto hit = Physics::ray_cast(bt_world, ray, 50.0f);
+            auto hit = physics.ray_cast(ray, 50.0f);
 
             if (hit.hasHit())
             {
@@ -244,6 +236,8 @@ int main()
 
         window.update();
     }
+
+    physics.release();
 
     window.destroy();
 
