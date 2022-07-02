@@ -71,7 +71,7 @@ int Shader::uniform_block_index(const std::string& name) const
     return glGetUniformBlockIndex(_handle, name.c_str());
 }
 
-void Shader::block_binding(int index, int binding) const
+void Shader::block_binding(const int index, const int binding) const
 {
     glUniformBlockBinding(_handle, index, binding);
 }
