@@ -1,8 +1,5 @@
 #include "buffer.hpp"
 
-#include <glad/glad.h>
-#include <cassert>
-
 Buffer::Buffer(uint32_t type, uint32_t usage, uint32_t size, void *data)
     : _type { type }
 {

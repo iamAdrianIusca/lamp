@@ -1,8 +1,5 @@
 #include "shader_stage.hpp"
 
-#include <glad/glad.h>
-#include <iostream>
-
 ShaderStage::ShaderStage(const char* data, const int type)
 {
     _handle = glCreateShader(type);
@@ -17,7 +14,7 @@ ShaderStage::ShaderStage(const char* data, const int type)
     if (!success)
     {
         glGetShaderInfoLog(_handle, 512, nullptr, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+        std::cout << "ERROR::SHADER::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
 }
 

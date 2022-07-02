@@ -1,8 +1,5 @@
 #include "vertex_array.hpp"
 
-#include <glad/glad.h>
-#include <cassert>
-
 void VertexArray::bind() const
 {
     glBindVertexArray(_handle);

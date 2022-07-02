@@ -1,7 +1,5 @@
 #include "window.hpp"
 
-#include <iostream>
-
 Window::Window()
 {
     m_data.isClosed = false;
@@ -19,7 +17,7 @@ void Window::create(const char *title, int width, int height)
         return;
     }
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -35,11 +33,21 @@ void Window::create(const char *title, int width, int height)
 
     glfwMakeContextCurrent(m_data.window);
 
+    #ifdef LAMP_WIN32
+
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return;
     }
+
+    #endif
+
+    #ifdef LAMP_WEB
+
+    glewInit();
+
+    #endif
 
     glViewport(0, 0, m_data.width, m_data.height);
 }

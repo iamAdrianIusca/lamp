@@ -1,8 +1,5 @@
 #include "mesh.hpp"
 
-#include <glad/glad.h>
-#include <cstddef>
-
 Mesh::Mesh(const uint32_t primitive)
     : _primitive { primitive }
 {

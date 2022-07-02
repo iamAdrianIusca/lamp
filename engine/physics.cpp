@@ -1,7 +1,5 @@
 #include "physics.hpp"
 
-#include <glm/gtc/matrix_transform.hpp>
-
 Physics::Physics()
     : _world { nullptr }
 {

@@ -1,7 +1,7 @@
 #version 430 core
 
-layout (location = 0) in vec3 position;
-layout (location = 1) in vec3 normal;
+layout (location = 0) in vec3 in_position;
+layout (location = 1) in vec3 in_normal;
 
 layout (location = 0) uniform mat4 u_model;
 
@@ -16,8 +16,8 @@ layout (location = 1) out vec3 out_normal;
 
 void main()
 {
-    gl_Position = u_camera.projection * u_camera.view * u_model * vec4(position, 1.0);
+    gl_Position = u_camera.projection * u_camera.view * u_model * vec4(in_position, 1.0);
 
-    out_position = vec3(u_model * vec4(position, 1.0));
-    out_normal   = normal;
+    out_position = vec3(u_model * vec4(in_position, 1.0));
+    out_normal   = in_normal;
 }

@@ -1,7 +1,5 @@
 #include "importer.hpp"
 
-#include <iostream>
-
 std::vector<model> Importer::import(const std::string& path)
 {
     Assimp::Importer importer;

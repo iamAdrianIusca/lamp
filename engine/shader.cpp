@@ -1,9 +1,6 @@
 #include "shader.hpp"
 #include "shader_stage.hpp"
 
-#include <glad/glad.h>
-#include <iostream>
-
 Shader::Shader(const char *vertexPath, const char *fragmentPath)
 {
     ShaderStage vertexShader(vertexPath,     GL_VERTEX_SHADER);
@@ -47,13 +44,36 @@ void Shader::setFloat(const std::string &name, float value) const
 {
 }
 
-void Shader::setMat4(int index, float* data)
+void Shader::setMat4(const int index, float* data) const
 {
     glUniformMatrix4fv(index, 1, GL_FALSE, data);
 }
 
-void Shader::setVec3(int index, float *data)
+void Shader::setVec3(const int index, float* data) const
 {
     glUniform3fv(index, 1, data);
 }
 
+#ifdef LAMP_WEB
+
+int Shader::attribute_location(const std::string& name) const
+{
+    return glGetAttribLocation(_handle, name.c_str());
+}
+
+int Shader::uniform_location(const std::string& name) const
+{
+    return glGetUniformLocation(_handle, name.c_str());
+}
+
+int Shader::uniform_block_index(const std::string& name) const
+{
+    return glGetUniformBlockIndex(_handle, name.c_str());
+}
+
+void Shader::block_binding(int index, int binding) const
+{
+    glUniformBlockBinding(_handle, index, binding);
+}
+
+#endif

@@ -1,18 +1,26 @@
+set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF)
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
 set(ASSIMP_BUILD_TESTS        OFF)
+set(ASSIMP_INSTALL            OFF)
+set(ASSIMP_WARNINGS_AS_ERRORS OFF)
+set(ASSIMP_BUILD_OBJ_IMPORTER ON)
 set(ASSIMP_NO_EXPORT          ON)
-
-set(GLFW_BUILD_DOCS     OFF)
-set(GLFW_BUILD_EXAMPLES OFF)
-set(GLFW_BUILD_TESTS    OFF)
 
 set(BUILD_UNIT_TESTS    OFF)
 set(BUILD_CPU_DEMOS     OFF)
 set(BUILD_EXTRAS        OFF)
 set(BUILD_BULLET2_DEMOS OFF)
 
-add_subdirectory(glfw)
-add_subdirectory(glad)
+if (LAMP_WIN32)
+    set(GLFW_BUILD_DOCS     OFF)
+    set(GLFW_BUILD_EXAMPLES OFF)
+    set(GLFW_BUILD_TESTS    OFF)
+    set(GLFW_INSTALL        OFF)
+
+    add_subdirectory(glfw)
+    add_subdirectory(glad)
+endif()
+
 add_subdirectory(glm)
 add_subdirectory(assimp)
 add_subdirectory(bullet3)

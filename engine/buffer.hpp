@@ -2,8 +2,6 @@
 
 #include "object.hpp"
 
-#include <cstdint>
-
 class Buffer final : public Object
 {
 public:

@@ -3,8 +3,6 @@
 #include "vertex_array.hpp"
 #include "submesh.hpp"
 
-#include <vector>
-
 struct Mesh
 {
     Mesh(uint32_t primitive);

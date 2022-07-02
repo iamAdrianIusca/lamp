@@ -1,12 +1,3 @@
-#include "glad/glad.h"
-
-#include <vector>
-#include <iostream>
-
-#include "glm/glm.hpp"
-#include "glm/gtc/type_ptr.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-
 #include "window.hpp"
 #include "vertex_array.hpp"
 #include "shader.hpp"
@@ -22,6 +13,9 @@
 #define LOAD_SINGLE_VBO  true
 #define LOAD_SINGLE_MESH false
 
+std::function<void()> loop;
+void main_loop() { loop(); }
+
 int main()
 {
     const int width  = 1000;
@@ -30,10 +24,10 @@ int main()
     Window window;
     window.create("Game Engine", width, height);
 
-    Shader shader(File::read_file("simple_vert.glsl").c_str(),
-                  File::read_file("simple_frag.glsl").c_str());
+    Shader shader(File::read_file("assets/simple_vert.glsl").c_str(),
+                  File::read_file("assets/simple_frag.glsl").c_str());
 
-    std::vector<model> models = Importer::import("tic_tac_toe.obj");
+    std::vector<model> models = Importer::import("assets/tic_tac_toe.obj");
 
     #if LOAD_SINGLE_VBO
 
@@ -113,17 +107,40 @@ int main()
 
     #endif
 
-    light  light { { 0.0f, 0.0f, 8.0f }, 1.0f, { 1.0f, 1.0f, 1.0f } };
+    int u_model_location = 0;
+    int u_color_location = 1;
 
-    Buffer light_ubo(GL_UNIFORM_BUFFER, GL_STATIC_DRAW, sizeof(light), &light);
-    light_ubo.bind(1);
+    #ifdef LAMP_WEB
+
+    u_model_location = shader.uniform_location("u_model");
+    u_color_location = shader.uniform_location("u_color");
+
+    const int u_camera_index = shader.uniform_block_index("camera");
+    const int u_light_index  = shader.uniform_block_index("light");
+
+    #endif
+
+    const int camera_binding_location = 0;
+    const int light_binding_location  = 1;
 
     data::camera camera;
     camera.projection = glm::perspective(glm::radians(45.0f), static_cast<float>(width) / static_cast<float>(height), 0.1f, 100.0f);
     camera.view       = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -31.0f));
 
     Buffer camera_ubo(GL_UNIFORM_BUFFER, GL_STATIC_DRAW, sizeof(camera), &camera);
-    camera_ubo.bind(0);
+    camera_ubo.bind(camera_binding_location);
+
+    data::light  light { { 0.0f, 0.0f, 8.0f }, 1.0f, { 1.0f, 1.0f, 1.0f } };
+
+    Buffer light_ubo(GL_UNIFORM_BUFFER, GL_STATIC_DRAW, sizeof(light), &light);
+    light_ubo.bind(light_binding_location);
+
+    #ifdef LAMP_WEB
+
+    shader.block_binding(u_camera_index, camera_binding_location);
+    shader.block_binding(u_light_index,  light_binding_location);
+
+    #endif
 
     Physics physics;
     physics.init();
@@ -139,8 +156,7 @@ int main()
 
     glEnable(GL_DEPTH_TEST);
 
-    // show the window
-    while (!window.isClosed())
+    loop = [&]
     {
         bool yellow = false;
 
@@ -181,8 +197,8 @@ int main()
             color = glm::vec3(1.0f, 1.0f, 0.0f);
         }
 
-        shader.setMat4(0, glm::value_ptr(transform));
-        shader.setVec3(1, glm::value_ptr(color));
+        shader.setMat4(u_model_location, glm::value_ptr(transform));
+        shader.setVec3(u_color_location, glm::value_ptr(color));
 
         #if LOAD_SINGLE_VBO
 
@@ -199,8 +215,8 @@ int main()
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         color     = glm::vec3(0.0f, 1.0f, 0.0f);
 
-        shader.setMat4(0, glm::value_ptr(transform));
-        shader.setVec3(1, glm::value_ptr(color));
+        shader.setMat4(u_model_location, glm::value_ptr(transform));
+        shader.setVec3(u_color_location, glm::value_ptr(color));
 
         #if  LOAD_SINGLE_VBO
         #if !LOAD_SINGLE_MESH
@@ -218,8 +234,8 @@ int main()
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         color     = glm::vec3(0.0f, 0.0f, 1.0f);
 
-        shader.setMat4(0, glm::value_ptr(transform));
-        shader.setVec3(1, glm::value_ptr(color));
+        shader.setMat4(u_model_location, glm::value_ptr(transform));
+        shader.setVec3(u_color_location, glm::value_ptr(color));
 
         #if  LOAD_SINGLE_VBO
         #if !LOAD_SINGLE_MESH
@@ -235,7 +251,22 @@ int main()
         #endif
 
         window.update();
+    };
+
+    #ifdef LAMP_WEB
+
+    emscripten_set_main_loop(main_loop, 0, true);
+
+    #endif
+
+    #ifdef LAMP_WIN32
+
+    while (!window.isClosed())
+    {
+        main_loop();
     }
+
+    #endif
 
     physics.release();
 

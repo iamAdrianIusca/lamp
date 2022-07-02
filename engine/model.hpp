@@ -3,8 +3,6 @@
 #include "vertex.hpp"
 #include "submesh.hpp"
 
-#include <vector>
-
 struct model
 {
     std::vector<vertex>       vertices;

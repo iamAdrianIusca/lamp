@@ -3,8 +3,6 @@
 #include "ray.hpp"
 #include "camera.hpp"
 
-#include <btBulletCollisionCommon.h>
-
 class Physics
 {
 public:
