@@ -85,7 +85,7 @@ int main()
 
     auto bt_shape = new btBoxShape(btVector3(2.80f, 2.80f, 1.0f));
 
-    physics.add_collision_object(bt_shape, { });
+    physics.add_collision_object(-1, bt_shape, { });
 
     glm::vec4 viewport { 0.0f, 0.0f, width, height };
 

@@ -15,7 +15,7 @@ public:
 
     btCollisionWorld::ClosestRayResultCallback ray_cast(const ray& ray, float distance) const;
 
-    void add_collision_object(btCollisionShape* shape, const glm::vec3& position);
+    void add_collision_object(int index, btCollisionShape* shape, const glm::vec3& position);
 
 private:
     btCollisionConfiguration*  _config;

@@ -45,7 +45,7 @@ btCollisionWorld::ClosestRayResultCallback Physics::ray_cast(const ray &ray, con
     return hit;
 }
 
-void Physics::add_collision_object(btCollisionShape* shape, const glm::vec3& position)
+void Physics::add_collision_object(const int index, btCollisionShape* shape, const glm::vec3& position)
 {
     btTransform transform;
     transform.setIdentity();
@@ -55,6 +55,7 @@ void Physics::add_collision_object(btCollisionShape* shape, const glm::vec3& pos
 
     object->setCollisionShape(shape);
     object->setWorldTransform(transform);
+    object->setUserIndex(index);
 
     _world->addCollisionObject(object);
 }
