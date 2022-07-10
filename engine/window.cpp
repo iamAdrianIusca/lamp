@@ -11,7 +11,7 @@ void Window::create(const char *title, int width, int height)
     m_data.width  = width;
     m_data.height = height;
 
-    if (!glfwInit())
+    if (!glfwInit()) // TODO move this in a platform class
     {
         std::cout << "Failed to initialize GLFW" << std::endl;
         return;

@@ -1,12 +1,2 @@
 .idea
 cmake
-
-# win32
-*.exe
-*.pdb
-
-# web
-*.data
-*.html
-*.wasm
-*.js

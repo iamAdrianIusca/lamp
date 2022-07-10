@@ -10,5 +10,9 @@ target_sources(${PROJECT_NAME} PRIVATE window.cpp shader.cpp shader_stage.cpp bu
                                        object.cpp importer.cpp mesh.cpp model.cpp physics.cpp)
 if (LAMP_WIN32)
     find_package(Vulkan)
-    target_link_libraries(${PROJECT_NAME} PUBLIC Vulkan::Vulkan glfw glad)
+
+    target_link_libraries(${PROJECT_NAME}      PUBLIC Vulkan::Vulkan glfw glad)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC LAMP_WIN32)
+elseif(LAMP_WEB)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC LAMP_WEB)
 endif()

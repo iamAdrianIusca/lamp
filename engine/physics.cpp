@@ -25,8 +25,10 @@ void Physics::release()
 
 ray Physics::screen_to_world(const glm::vec2 &mouse, const data::camera& camera, const glm::vec4 &viewport)
 {
-    glm::vec3 start     = glm::unProject(glm::vec3(mouse.x, mouse.y, 0.0f), camera.view, camera.projection, viewport);
-    glm::vec3 end       = glm::unProject(glm::vec3(mouse.x, mouse.y, 1.0f), camera.view, camera.projection, viewport);
+    float y = viewport.w - mouse.y;
+
+    glm::vec3 start     = glm::unProject(glm::vec3(mouse.x, y, 0.0f), camera.view, camera.projection, viewport);
+    glm::vec3 end       = glm::unProject(glm::vec3(mouse.x, y, 1.0f), camera.view, camera.projection, viewport);
     glm::vec3 direction = glm::normalize(end - start);
 
     return { start, direction };
